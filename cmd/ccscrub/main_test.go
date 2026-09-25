@@ -10,17 +10,17 @@ func TestRun(t *testing.T) {
 	}{
 		{
 			name: "no args",
-			args: []string{".ccscrub"},
+			args: []string{"ccscrub"},
 			want: 2,
 		},
 		{
 			name: "scan",
-			args: []string{".ccscrub", "scan"},
+			args: []string{"ccscrub", "scan"},
 			want: 0,
 		},
 		{
 			name: "fix",
-			args: []string{".ccscrub", "fix"},
+			args: []string{"ccscrub", "fix"},
 			want: 0,
 		},
 		{
