@@ -1,0 +1,8 @@
+/ccscrub
+/ccscrub.exe
+*.exe
+*.test
+
+# internal working docs, not for public repo
+/CLAUDE.md
+/docs/
