@@ -19,7 +19,7 @@ func run(args []string) int {
 	case "scan":
 		fmt.Println("scanに来た")
 		fs := flag.NewFlagSet("scan", flag.ExitOnError)
-		lang := fs.String("lang", "", "message language: en, ja, zh (default en)")
+		lang := addLangFlag(fs)
 		err := fs.Parse(args[2:])
 		if err != nil {
 			return 2
@@ -28,9 +28,22 @@ func run(args []string) int {
 		return 0
 	case "fix":
 		fmt.Println("fixに来た")
+		fs := flag.NewFlagSet("fix", flag.ExitOnError)
+		dryRun := fs.Bool("dry-run", false, "show what would change without modifying any files")
+		lang := addLangFlag(fs)
+		err := fs.Parse(args[2:])
+		if err != nil {
+			return 2
+		}
+		fmt.Println(*lang)
+		fmt.Println(*dryRun)
 		return 0
 	default:
 		fmt.Println("defaultに来た")
 		return 2
 	}
+}
+
+func addLangFlag(fs *flag.FlagSet) *string {
+	return fs.String("lang", "", "message language: en, ja, zh (default en)")
 }
