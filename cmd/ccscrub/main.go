@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/su-fu/ccscrub/internal/i18n"
 	"os"
 )
 
@@ -13,6 +14,7 @@ func main() {
 
 func run(args []string) int {
 	if len(args) < 2 {
+		fmt.Fprintln(os.Stderr, i18n.T("en", i18n.MsgUsage))
 		return 2
 	}
 
@@ -46,7 +48,8 @@ func run(args []string) int {
 		fmt.Println(*dryRun)
 		return 0
 	default:
-		fmt.Println("defaultに来た")
+		fmt.Fprintln(os.Stderr, i18n.T("en", i18n.MsgUnknownSubcommand, args[1]))
+		fmt.Fprintln(os.Stderr, i18n.T("en", i18n.MsgUsage))
 		return 2
 	}
 }
