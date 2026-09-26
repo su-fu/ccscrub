@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 )
@@ -17,6 +18,13 @@ func run(args []string) int {
 	switch args[1] {
 	case "scan":
 		fmt.Println("scanに来た")
+		fs := flag.NewFlagSet("scan", flag.ExitOnError)
+		lang := fs.String("lang", "", "message language: en, ja, zh (default en)")
+		err := fs.Parse(args[2:])
+		if err != nil {
+			return 2
+		}
+		fmt.Println(*lang)
 		return 0
 	case "fix":
 		fmt.Println("fixに来た")
