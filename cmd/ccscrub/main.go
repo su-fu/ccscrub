@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -18,9 +19,12 @@ func run(args []string) int {
 	switch args[1] {
 	case "scan":
 		fmt.Println("scanに来た")
-		fs := flag.NewFlagSet("scan", flag.ExitOnError)
+		fs := flag.NewFlagSet("scan", flag.ContinueOnError)
 		lang := addLangFlag(fs)
 		err := fs.Parse(args[2:])
+		if errors.Is(err, flag.ErrHelp) {
+			return 0
+		}
 		if err != nil {
 			return 2
 		}
@@ -28,10 +32,13 @@ func run(args []string) int {
 		return 0
 	case "fix":
 		fmt.Println("fixに来た")
-		fs := flag.NewFlagSet("fix", flag.ExitOnError)
+		fs := flag.NewFlagSet("fix", flag.ContinueOnError)
 		dryRun := fs.Bool("dry-run", false, "show what would change without modifying any files")
 		lang := addLangFlag(fs)
 		err := fs.Parse(args[2:])
+		if errors.Is(err, flag.ErrHelp) {
+			return 0
+		}
 		if err != nil {
 			return 2
 		}
