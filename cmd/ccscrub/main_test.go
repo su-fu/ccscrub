@@ -57,3 +57,44 @@ func TestRun(t *testing.T) {
 		})
 	}
 }
+
+func TestResolveLang(t *testing.T) {
+	tests := []struct {
+		name     string
+		flagLang string
+		envLang  string
+		want     string
+	}{
+		{
+			name:     "flag ja, no env",
+			flagLang: "ja",
+			envLang:  "",
+			want:     "ja",
+		},
+		{
+			name:     "no flag, env zh",
+			flagLang: "",
+			envLang:  "zh",
+			want:     "zh",
+		},
+		{
+			name:     "flag ja, env zh",
+			flagLang: "ja",
+			envLang:  "zh",
+			want:     "ja",
+		},
+		{
+			name:     "no flag, no env",
+			flagLang: "",
+			envLang:  "",
+			want:     "en",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := resolveLang(tt.flagLang, tt.envLang); got != tt.want {
+				t.Errorf("resolveLang(%q, %q) = %q, want %q", tt.flagLang, tt.envLang, got, tt.want)
+			}
+		})
+	}
+}
