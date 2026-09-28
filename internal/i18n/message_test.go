@@ -1,6 +1,9 @@
 package i18n
 
-import "testing"
+import (
+	"errors"
+	"testing"
+)
 
 func TestT(t *testing.T) {
 	tests := []struct {
@@ -65,6 +68,62 @@ func TestT(t *testing.T) {
 			id:   MsgUnknownSubcommand,
 			args: []any{"foo"},
 			want: `unknown subcommand: "foo"`,
+		},
+		{
+			name: "path not found(en)",
+			lang: "en",
+			id:   MsgPathNotFound,
+			args: []any{"projects"},
+			want: `"projects" not found`,
+		},
+		{
+			name: "path not found(ja)",
+			lang: "ja",
+			id:   MsgPathNotFound,
+			args: []any{"projects"},
+			want: `"projects" が見つかりません`,
+		},
+		{
+			name: "path not found(zh)",
+			lang: "zh",
+			id:   MsgPathNotFound,
+			args: []any{"projects"},
+			want: `未找到 "projects"`,
+		},
+		{
+			name: "path not found(fr)",
+			lang: "fr",
+			id:   MsgPathNotFound,
+			args: []any{"projects"},
+			want: `"projects" not found`,
+		},
+		{
+			name: "path access error(en)",
+			lang: "en",
+			id:   MsgPathAccessError,
+			args: []any{"projects", errors.New("permission denied")},
+			want: `cannot access "projects": permission denied`,
+		},
+		{
+			name: "path access error(ja)",
+			lang: "ja",
+			id:   MsgPathAccessError,
+			args: []any{"projects", errors.New("permission denied")},
+			want: `"projects" にアクセスできません: permission denied`,
+		},
+		{
+			name: "path access error(zh)",
+			lang: "zh",
+			id:   MsgPathAccessError,
+			args: []any{"projects", errors.New("permission denied")},
+			want: `无法访问 "projects": permission denied`,
+		},
+		{
+			name: "path access error(fr)",
+			lang: "fr",
+			id:   MsgPathAccessError,
+			args: []any{"projects", errors.New("permission denied")},
+			want: `cannot access "projects": permission denied`,
 		},
 	}
 

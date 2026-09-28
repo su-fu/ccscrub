@@ -4,8 +4,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/su-fu/ccscrub/internal/i18n"
+	"io/fs"
 	"os"
+	"path/filepath"
+
+	"github.com/su-fu/ccscrub/internal/discover"
+	"github.com/su-fu/ccscrub/internal/i18n"
 )
 
 const langEnv = "CCSCRUB_LANG"
@@ -23,9 +27,9 @@ func run(args []string) int {
 	switch args[1] {
 	case "scan":
 		fmt.Println("scanに来た")
-		fs := flag.NewFlagSet("scan", flag.ContinueOnError)
-		lang := addLangFlag(fs)
-		err := fs.Parse(args[2:])
+		fset := flag.NewFlagSet("scan", flag.ContinueOnError)
+		lang := addLangFlag(fset)
+		err := fset.Parse(args[2:])
 		resolvedLang := resolveLang(*lang, os.Getenv(langEnv))
 		if errors.Is(err, flag.ErrHelp) {
 			return 0
@@ -34,13 +38,35 @@ func run(args []string) int {
 			return 2
 		}
 		fmt.Println(resolvedLang)
+
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return 2
+		}
+
+		root := filepath.Join(home, ".claude", "projects")
+
+		paths, err := discover.Find(root)
+		if errors.Is(err, fs.ErrNotExist) {
+			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgPathNotFound, root))
+			return 2
+		}
+		if err != nil {
+			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgPathAccessError, root, err))
+			return 2
+		}
+
+		for _, p := range paths {
+			fmt.Println(p)
+		}
+
 		return 0
 	case "fix":
 		fmt.Println("fixに来た")
-		fs := flag.NewFlagSet("fix", flag.ContinueOnError)
-		dryRun := fs.Bool("dry-run", false, "show what would change without modifying any files")
-		lang := addLangFlag(fs)
-		err := fs.Parse(args[2:])
+		fset := flag.NewFlagSet("fix", flag.ContinueOnError)
+		dryRun := fset.Bool("dry-run", false, "show what would change without modifying any files")
+		lang := addLangFlag(fset)
+		err := fset.Parse(args[2:])
 		resolvedLang := resolveLang(*lang, os.Getenv(langEnv))
 		if errors.Is(err, flag.ErrHelp) {
 			return 0
