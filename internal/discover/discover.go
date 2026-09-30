@@ -6,15 +6,29 @@ import (
 	"path/filepath"
 )
 
-func Find(root string) ([]string, error) {
+type SkipReason string
+
+const (
+	SkipUnreadable SkipReason = "unreadable"
+)
+
+type SkippedEntry struct {
+	Path   string
+	Reason SkipReason
+	Err    error
+}
+
+func Find(root string) ([]string, []SkippedEntry, error) {
 	var result []string
+	var skippedList []SkippedEntry
 	_, err := os.Stat(root)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	err = filepath.WalkDir(root, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
+			skippedList = append(skippedList, SkippedEntry{Path: path, Reason: SkipUnreadable, Err: err})
 			return nil
 		}
 		if d.IsDir() {
@@ -28,8 +42,8 @@ func Find(root string) ([]string, error) {
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return result, nil
+	return result, skippedList, nil
 }

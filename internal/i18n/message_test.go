@@ -125,6 +125,62 @@ func TestT(t *testing.T) {
 			args: []any{"projects", errors.New("permission denied")},
 			want: `cannot access "projects": permission denied`,
 		},
+		{
+			name: "path cannot read(en)",
+			lang: "en",
+			id:   MsgCannotRead,
+			args: []any{"projects", errors.New("permission denied")},
+			want: `[SKIP] cannot read "projects": permission denied`,
+		},
+		{
+			name: "path cannot read(ja)",
+			lang: "ja",
+			id:   MsgCannotRead,
+			args: []any{"projects", errors.New("permission denied")},
+			want: `[SKIP] "projects" を読めません: permission denied`,
+		},
+		{
+			name: "path cannot read(zh)",
+			lang: "zh",
+			id:   MsgCannotRead,
+			args: []any{"projects", errors.New("permission denied")},
+			want: `[SKIP] 无法读取 "projects": permission denied`,
+		},
+		{
+			name: "path cannot read(fr)",
+			lang: "fr",
+			id:   MsgCannotRead,
+			args: []any{"projects", errors.New("permission denied")},
+			want: `[SKIP] cannot read "projects": permission denied`,
+		},
+		{
+			name: "skipped(en)",
+			lang: "en",
+			id:   MsgSkipped,
+			args: []any{"projects", "active"},
+			want: `[SKIP] "projects" (reason: active)`,
+		},
+		{
+			name: "skipped(ja)",
+			lang: "ja",
+			id:   MsgSkipped,
+			args: []any{"projects", "active"},
+			want: `[SKIP] "projects" (理由: active)`,
+		},
+		{
+			name: "skipped(zh)",
+			lang: "zh",
+			id:   MsgSkipped,
+			args: []any{"projects", "active"},
+			want: `[SKIP] "projects" (原因: active)`,
+		},
+		{
+			name: "skipped(fr)",
+			lang: "fr",
+			id:   MsgSkipped,
+			args: []any{"projects", "active"},
+			want: `[SKIP] "projects" (reason: active)`,
+		},
 	}
 
 	for _, tt := range tests {

@@ -46,7 +46,7 @@ func run(args []string) int {
 
 		root := filepath.Join(home, ".claude", "projects")
 
-		paths, err := discover.Find(root)
+		paths, skippedList, err := discover.Find(root)
 		if errors.Is(err, fs.ErrNotExist) {
 			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgPathNotFound, root))
 			return 2
@@ -58,6 +58,15 @@ func run(args []string) int {
 
 		for _, p := range paths {
 			fmt.Println(p)
+		}
+
+		for _, skipped := range skippedList {
+			switch skipped.Reason {
+			case discover.SkipUnreadable:
+				fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgCannotRead, skipped.Path, skipped.Err))
+			default:
+				fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgSkipped, skipped.Path, skipped.Reason))
+			}
 		}
 
 		return 0

@@ -38,18 +38,21 @@ func TestFind(t *testing.T) {
 		filepath.Join(root, "projB", "ccc.jsonl"),
 	}
 
-	got, err := Find(root)
+	got, skippedList, err := Find(root)
 	if err != nil {
 		t.Fatalf("Find(%q) error = %v", root, err)
 	}
 	if !slices.Equal(got, want) {
 		t.Errorf("Find(%q) = %v, want %v", root, got, want)
 	}
+	if skippedList != nil {
+		t.Errorf("Find(%q) skipped = %#v, want nil", root, skippedList)
+	}
 }
 
 func TestFindMissingRoot(t *testing.T) {
 	root := filepath.Join(t.TempDir(), "nope")
-	paths, err := Find(root)
+	paths, skippedList, err := Find(root)
 	if err == nil {
 		t.Fatalf("Find(%q) error = %v, want an error", root, err)
 	}
@@ -58,5 +61,8 @@ func TestFindMissingRoot(t *testing.T) {
 	}
 	if paths != nil {
 		t.Errorf("Find(%q) paths = %#v, want nil", root, paths)
+	}
+	if skippedList != nil {
+		t.Errorf("Find(%q) skipped = %#v, want nil", root, skippedList)
 	}
 }
