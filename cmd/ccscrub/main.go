@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/su-fu/ccscrub/internal/discover"
 	"github.com/su-fu/ccscrub/internal/i18n"
@@ -45,8 +46,7 @@ func run(args []string) int {
 		}
 
 		root := filepath.Join(home, ".claude", "projects")
-
-		paths, skippedList, err := discover.Find(root)
+		paths, skippedList, err := discover.Find(root, 30*time.Minute, time.Now())
 		if errors.Is(err, fs.ErrNotExist) {
 			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgPathNotFound, root))
 			return 2
