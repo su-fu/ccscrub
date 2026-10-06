@@ -48,6 +48,21 @@ func TestRun(t *testing.T) {
 			args: []string{"ccscrub", "fix", "--foo"},
 			want: 2,
 		},
+		{
+			name: "scan --min-age=-5m",
+			args: []string{"ccscrub", "scan", "--min-age=-5m"},
+			want: 2,
+		},
+		{
+			name: "fix --min-age=-5m",
+			args: []string{"ccscrub", "fix", "--min-age=-5m"},
+			want: 2,
+		},
+		{
+			name: "scan --min-age=abc",
+			args: []string{"ccscrub", "scan", "--min-age=abc"},
+			want: 2,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

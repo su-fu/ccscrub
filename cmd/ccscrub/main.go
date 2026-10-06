@@ -14,6 +14,7 @@ import (
 )
 
 const langEnv = "CCSCRUB_LANG"
+const defaultMinAge = 30 * time.Minute
 
 func main() {
 	os.Exit(run(os.Args))
@@ -30,12 +31,17 @@ func run(args []string) int {
 		fmt.Println("scanに来た")
 		fset := flag.NewFlagSet("scan", flag.ContinueOnError)
 		lang := addLangFlag(fset)
+		minAge := addMinAgeFlag(fset)
 		err := fset.Parse(args[2:])
 		resolvedLang := resolveLang(*lang, os.Getenv(langEnv))
 		if errors.Is(err, flag.ErrHelp) {
 			return 0
 		}
 		if err != nil {
+			return 2
+		}
+		if *minAge < 0 {
+			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgInvalidMinAge, *minAge))
 			return 2
 		}
 		fmt.Println(resolvedLang)
@@ -46,7 +52,7 @@ func run(args []string) int {
 		}
 
 		root := filepath.Join(home, ".claude", "projects")
-		paths, skippedList, err := discover.Find(root, 30*time.Minute, time.Now())
+		paths, skippedList, err := discover.Find(root, *minAge, time.Now())
 		if errors.Is(err, fs.ErrNotExist) {
 			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgPathNotFound, root))
 			return 2
@@ -75,6 +81,7 @@ func run(args []string) int {
 		fset := flag.NewFlagSet("fix", flag.ContinueOnError)
 		dryRun := fset.Bool("dry-run", false, "show what would change without modifying any files")
 		lang := addLangFlag(fset)
+		minAge := addMinAgeFlag(fset)
 		err := fset.Parse(args[2:])
 		resolvedLang := resolveLang(*lang, os.Getenv(langEnv))
 		if errors.Is(err, flag.ErrHelp) {
@@ -83,8 +90,13 @@ func run(args []string) int {
 		if err != nil {
 			return 2
 		}
+		if *minAge < 0 {
+			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgInvalidMinAge, *minAge))
+			return 2
+		}
 		fmt.Println(resolvedLang)
 		fmt.Println(*dryRun)
+		fmt.Println(*minAge)
 		return 0
 	default:
 		fmt.Fprintln(os.Stderr, i18n.T(resolveLang("", os.Getenv(langEnv)), i18n.MsgUnknownSubcommand, args[1]))
@@ -106,4 +118,8 @@ func resolveLang(flagLang string, envLang string) string {
 		resolvedLang = "en"
 	}
 	return resolvedLang
+}
+
+func addMinAgeFlag(fs *flag.FlagSet) *time.Duration {
+	return fs.Duration("min-age", defaultMinAge, "skip transcripts modified within this duration, as they may be in use (e.g. 30m, 2h)")
 }

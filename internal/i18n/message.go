@@ -13,6 +13,7 @@ const (
 	MsgPathAccessError
 	MsgSkipped
 	MsgCannotRead
+	MsgInvalidMinAge
 )
 
 var messageEn = map[MessageID]string{
@@ -22,6 +23,7 @@ var messageEn = map[MessageID]string{
 	MsgPathAccessError:   "cannot access %q: %v",
 	MsgSkipped:           "[SKIP] %q (reason: %s)",
 	MsgCannotRead:        "[SKIP] cannot read %q: %v",
+	MsgInvalidMinAge:     "invalid value %q for flag -min-age: must not be negative",
 }
 
 var messageJa = map[MessageID]string{
@@ -31,6 +33,7 @@ var messageJa = map[MessageID]string{
 	MsgPathAccessError:   "%q にアクセスできません: %v",
 	MsgSkipped:           "[SKIP] %q (理由: %s)",
 	MsgCannotRead:        "[SKIP] %q を読めません: %v",
+	MsgInvalidMinAge:     "-min-age の値 %q は不正です: 負の値は指定できません",
 }
 
 var messageZh = map[MessageID]string{
@@ -40,6 +43,7 @@ var messageZh = map[MessageID]string{
 	MsgPathAccessError:   "无法访问 %q: %v",
 	MsgSkipped:           "[SKIP] %q (原因: %s)",
 	MsgCannotRead:        "[SKIP] 无法读取 %q: %v",
+	MsgInvalidMinAge:     "-min-age 的值 %q 无效: 不能为负数",
 }
 
 var messages = map[string]map[MessageID]string{

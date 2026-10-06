@@ -3,6 +3,7 @@ package i18n
 import (
 	"errors"
 	"testing"
+	"time"
 )
 
 func TestT(t *testing.T) {
@@ -180,6 +181,34 @@ func TestT(t *testing.T) {
 			id:   MsgSkipped,
 			args: []any{"projects", "active"},
 			want: `[SKIP] "projects" (reason: active)`,
+		},
+		{
+			name: "invalid min-age(en)",
+			lang: "en",
+			id:   MsgInvalidMinAge,
+			args: []any{-5 * time.Minute},
+			want: `invalid value "-5m0s" for flag -min-age: must not be negative`,
+		},
+		{
+			name: "invalid min-age(ja)",
+			lang: "ja",
+			id:   MsgInvalidMinAge,
+			args: []any{-5 * time.Minute},
+			want: `-min-age の値 "-5m0s" は不正です: 負の値は指定できません`,
+		},
+		{
+			name: "invalid min-age(zh)",
+			lang: "zh",
+			id:   MsgInvalidMinAge,
+			args: []any{-5 * time.Minute},
+			want: `-min-age 的值 "-5m0s" 无效: 不能为负数`,
+		},
+		{
+			name: "invalid min-age(fr)",
+			lang: "fr",
+			id:   MsgInvalidMinAge,
+			args: []any{-5 * time.Minute},
+			want: `invalid value "-5m0s" for flag -min-age: must not be negative`,
 		},
 	}
 
