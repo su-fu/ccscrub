@@ -52,7 +52,8 @@ func run(args []string) int {
 		}
 
 		root := filepath.Join(home, ".claude", "projects")
-		paths, skippedList, err := discover.Find(root, *minAge, time.Now())
+		now := time.Now()
+		paths, skippedList, err := discover.Find(root, *minAge, now)
 		if errors.Is(err, fs.ErrNotExist) {
 			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgPathNotFound, root))
 			return 2
@@ -70,6 +71,8 @@ func run(args []string) int {
 			switch skipped.Reason {
 			case discover.SkipUnreadable:
 				fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgCannotRead, skipped.Path, skipped.Err))
+			case discover.SkipActive:
+				fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgSkippedActive, skipped.Path, now.Sub(skipped.LastModified).Round(time.Second)))
 			default:
 				fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgSkipped, skipped.Path, skipped.Reason))
 			}

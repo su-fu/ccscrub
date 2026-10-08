@@ -14,6 +14,7 @@ const (
 	MsgSkipped
 	MsgCannotRead
 	MsgInvalidMinAge
+	MsgSkippedActive
 )
 
 var messageEn = map[MessageID]string{
@@ -24,6 +25,7 @@ var messageEn = map[MessageID]string{
 	MsgSkipped:           "[SKIP] %q (reason: %s)",
 	MsgCannotRead:        "[SKIP] cannot read %q: %v",
 	MsgInvalidMinAge:     "invalid value %q for flag -min-age: must not be negative",
+	MsgSkippedActive:     "[SKIP] %q may be in use (modified %v ago)",
 }
 
 var messageJa = map[MessageID]string{
@@ -34,6 +36,7 @@ var messageJa = map[MessageID]string{
 	MsgSkipped:           "[SKIP] %q (理由: %s)",
 	MsgCannotRead:        "[SKIP] %q を読めません: %v",
 	MsgInvalidMinAge:     "-min-age の値 %q は不正です: 負の値は指定できません",
+	MsgSkippedActive:     "[SKIP] %q は使用中の可能性があります (%v 前に更新)",
 }
 
 var messageZh = map[MessageID]string{
@@ -44,6 +47,7 @@ var messageZh = map[MessageID]string{
 	MsgSkipped:           "[SKIP] %q (原因: %s)",
 	MsgCannotRead:        "[SKIP] 无法读取 %q: %v",
 	MsgInvalidMinAge:     "-min-age 的值 %q 无效: 不能为负数",
+	MsgSkippedActive:     "[SKIP] %q 可能正在使用 (%v 前更新)",
 }
 
 var messages = map[string]map[MessageID]string{

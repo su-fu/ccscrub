@@ -210,6 +210,34 @@ func TestT(t *testing.T) {
 			args: []any{-5 * time.Minute},
 			want: `invalid value "-5m0s" for flag -min-age: must not be negative`,
 		},
+		{
+			name: "skipped active(en)",
+			lang: "en",
+			id:   MsgSkippedActive,
+			args: []any{"project", 4 * time.Minute},
+			want: `[SKIP] "project" may be in use (modified 4m0s ago)`,
+		},
+		{
+			name: "skipped active(ja)",
+			lang: "ja",
+			id:   MsgSkippedActive,
+			args: []any{"project", 4 * time.Minute},
+			want: `[SKIP] "project" は使用中の可能性があります (4m0s 前に更新)`,
+		},
+		{
+			name: "skipped active(zh)",
+			lang: "zh",
+			id:   MsgSkippedActive,
+			args: []any{"project", 4 * time.Minute},
+			want: `[SKIP] "project" 可能正在使用 (4m0s 前更新)`,
+		},
+		{
+			name: "skipped active(fr)",
+			lang: "fr",
+			id:   MsgSkippedActive,
+			args: []any{"project", 4 * time.Minute},
+			want: `[SKIP] "project" may be in use (modified 4m0s ago)`,
+		},
 	}
 
 	for _, tt := range tests {
