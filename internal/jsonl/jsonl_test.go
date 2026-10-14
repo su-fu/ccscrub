@@ -2,6 +2,7 @@ package jsonl
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"slices"
 	"strings"
@@ -38,7 +39,7 @@ func TestReadLines(t *testing.T) {
 				t.Errorf("error = %v, want nil", err)
 			}
 			if !slices.Equal(got, tt.want) {
-				t.Errorf("ReadLines = %q, want %q", got, tt.want)
+				t.Errorf("ReadLines = %q, want %q", shortAll(got), shortAll(tt.want))
 			}
 		})
 	}
@@ -82,4 +83,19 @@ func TestReadLinesReadError(t *testing.T) {
 	if !slices.Equal(got, want) {
 		t.Errorf("ReadLines = %q, want %q", got, want)
 	}
+}
+
+func short(s string) string {
+	if len(s) <= 40 {
+		return s
+	}
+	return fmt.Sprintf("%s...(%d bytes)", s[:20], len(s))
+}
+
+func shortAll(lines []string) []string {
+	var out []string
+	for _, s := range lines {
+		out = append(out, short(s))
+	}
+	return out
 }
