@@ -11,6 +11,7 @@ import (
 
 	"github.com/su-fu/ccscrub/internal/discover"
 	"github.com/su-fu/ccscrub/internal/i18n"
+	"github.com/su-fu/ccscrub/internal/jsonl"
 )
 
 const langEnv = "CCSCRUB_LANG"
@@ -64,7 +65,12 @@ func run(args []string) int {
 		}
 
 		for _, p := range paths {
-			fmt.Println(p)
+			n, err := countLines(p)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgCannotRead, p, err))
+				continue
+			}
+			fmt.Printf("%s\t%d\n", p, n)
 		}
 
 		for _, skipped := range skippedList {
@@ -125,4 +131,21 @@ func resolveLang(flagLang string, envLang string) string {
 
 func addMinAgeFlag(fs *flag.FlagSet) *time.Duration {
 	return fs.Duration("min-age", defaultMinAge, "skip transcripts modified within this duration, as they may be in use (e.g. 30m, 2h)")
+}
+
+func countLines(path string) (int, error) {
+	count := 0
+	f, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	defer f.Close()
+	err = jsonl.ReadLines(f, func(num int, line []byte) error {
+		count++
+		return nil
+	})
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }
