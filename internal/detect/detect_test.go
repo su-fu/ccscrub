@@ -36,3 +36,26 @@ func TestFind(t *testing.T) {
 		})
 	}
 }
+
+func TestPreview(t *testing.T) {
+	tok := "gh" + "p_" + strings.Repeat("A", 32) + "WXYZ"
+	tests := []struct {
+		name string
+		line string
+		m    Match
+		want string
+	}{
+		{name: "github token", line: tok, m: Match{RuleID: "github-token", Start: 0, End: 40}, want: "ghp_****WXYZ"},
+		{name: "token in text", line: "key" + tok, m: Match{RuleID: "github-token", Start: 3, End: 43}, want: "ghp_****WXYZ"},
+		{name: "exactly 12 bytes", line: strings.Repeat("B", 12), m: Match{RuleID: "github-token", Start: 0, End: 12}, want: "****"},
+		{name: "13 bytes", line: "ABCD" + "xxxxx" + "WXYZ", m: Match{RuleID: "github-token", Start: 0, End: 13}, want: "ABCD****WXYZ"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Preview([]byte(tt.line), tt.m)
+			if got != tt.want {
+				t.Errorf("Preview(%q) got = %q, want = %q", tt.line, got, tt.want)
+			}
+		})
+	}
+}

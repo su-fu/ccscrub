@@ -4,6 +4,12 @@ import (
 	"regexp"
 )
 
+// previewKeep and previewMinLen control how Preview masks a match.
+const (
+	previewKeep   = 4
+	previewMinLen = 12
+)
+
 type Rule struct {
 	ID      string
 	Pattern *regexp.Regexp
@@ -28,4 +34,17 @@ func Find(line []byte) []Match {
 		}
 	}
 	return result
+}
+
+// Preview returns a masked form of the match m in line.
+//
+// It shows only the first and last previewKeep bytes, with "****" between them.
+// If the match is previewMinLen bytes or shorter, it returns only "****".
+// It never returns the full matched text.
+func Preview(line []byte, m Match) string {
+	s := line[m.Start:m.End]
+	if len(s) <= previewMinLen {
+		return "****"
+	}
+	return string(s[:previewKeep]) + "****" + string(s[len(s)-previewKeep:])
 }
