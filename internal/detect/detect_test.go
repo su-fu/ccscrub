@@ -26,6 +26,20 @@ func TestFind(t *testing.T) {
 		}},
 		{name: "wrong prefix", line: "gh" + "x_" + strings.Repeat("A", 36), want: nil},
 		{name: "too short", line: "gh" + "p_" + strings.Repeat("A", 10), want: nil},
+		{name: "after newline escape", line: `\n` + tok, want: []Match{
+			{RuleID: "github-token", Start: 2, End: 42},
+		}},
+		{name: "after tab escape", line: `\t` + tok, want: []Match{
+			{RuleID: "github-token", Start: 2, End: 42},
+		}},
+		{name: "after carriage return escape", line: `\r` + tok, want: []Match{
+			{RuleID: "github-token", Start: 2, End: 42},
+		}},
+		{name: "inside a word", line: "x" + tok, want: nil},
+		{name: "too long", line: tok + "A", want: nil},
+		{name: "in JSON quotes", line: `"` + tok + `"`, want: []Match{
+			{RuleID: "github-token", Start: 1, End: 41},
+		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

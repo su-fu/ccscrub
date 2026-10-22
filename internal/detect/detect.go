@@ -30,6 +30,9 @@ func Find(line []byte) []Match {
 	for _, rule := range rules {
 		locs := rule.Pattern.FindAllIndex(line, -1)
 		for _, loc := range locs {
+			if !okBefore(line, loc[0]) || !okAfter(line, loc[1]) {
+				continue
+			}
 			result = append(result, Match{RuleID: rule.ID, Start: loc[0], End: loc[1]})
 		}
 	}
@@ -47,4 +50,25 @@ func Preview(line []byte, m Match) string {
 		return "****"
 	}
 	return string(s[:previewKeep]) + "****" + string(s[len(s)-previewKeep:])
+}
+
+func isWordChar(b byte) bool {
+	return (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || (b >= '0' && b <= '9') || (b == '_')
+}
+
+func okBefore(line []byte, start int) bool {
+	if start == 0 {
+		return true
+	}
+	if (start >= 2) && (line[start-2] == '\\') && (line[start-1] == 'n' || line[start-1] == 't' || line[start-1] == 'r') {
+		return true
+	}
+	return !isWordChar(line[start-1])
+}
+
+func okAfter(line []byte, end int) bool {
+	if end == len(line) {
+		return true
+	}
+	return !isWordChar(line[end])
 }
