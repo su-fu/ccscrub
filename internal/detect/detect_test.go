@@ -8,6 +8,7 @@ import (
 
 func TestFind(t *testing.T) {
 	tok := "gh" + "p_" + strings.Repeat("A", 36)
+	aws := "AK" + "IA" + strings.Repeat("A", 16)
 	tests := []struct {
 		name string
 		line string
@@ -39,6 +40,19 @@ func TestFind(t *testing.T) {
 		{name: "too long", line: tok + "A", want: nil},
 		{name: "in JSON quotes", line: `"` + tok + `"`, want: []Match{
 			{RuleID: "github-token", Start: 1, End: 41},
+		}},
+		{name: "aws key", line: aws, want: []Match{
+			{RuleID: "aws-access-key-id", Start: 0, End: 20},
+		}},
+		{name: "aws key in env", line: "AWS_ACCESS_KEY_ID=" + aws, want: []Match{
+			{RuleID: "aws-access-key-id", Start: 18, End: 38},
+		}},
+		{name: "aws temporary key", line: "AS" + "IA" + strings.Repeat("A", 16), want: []Match{
+			{RuleID: "aws-access-key-id", Start: 0, End: 20},
+		}},
+		{name: "aws lowercase", line: "AK" + "IA" + strings.Repeat("a", 16), want: nil},
+		{name: "aws after newline escape", line: "test" + `\n` + aws, want: []Match{
+			{RuleID: "aws-access-key-id", Start: 6, End: 26},
 		}},
 	}
 	for _, tt := range tests {
