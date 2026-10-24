@@ -1,8 +1,14 @@
 package main
 
-import "testing"
+import (
+	"os"
+	"path/filepath"
+	"strings"
+	"testing"
+)
 
 func TestRun(t *testing.T) {
+	setupHome(t)
 	tests := []struct {
 		name string
 		args []string
@@ -112,4 +118,38 @@ func TestResolveLang(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRunScanFindsSecret(t *testing.T) {
+	dir := setupHome(t)
+	path := filepath.Join(dir, "test.jsonl")
+
+	tok := "gh" + "p_" + strings.Repeat("A", 36)
+	content := `{"text":"` + tok + `"}` + "\n"
+
+	err := os.WriteFile(path, []byte(content), 0o644)
+	if err != nil {
+		t.Fatalf("WriteFile(%q): %v", path, err)
+	}
+	args := []string{"ccscrub", "scan", "--min-age=0"}
+	got := run(args)
+	want := 1
+
+	if got != want {
+		t.Errorf("run(%q) = %d, want %d", args, got, want)
+	}
+}
+
+func setupHome(t *testing.T) string {
+	t.Helper()
+	home := t.TempDir()
+	dir := filepath.Join(home, ".claude", "projects")
+	err := os.MkdirAll(dir, 0o755)
+	if err != nil {
+		t.Fatalf("MkdirAll(%q): %v", dir, err)
+	}
+	t.Setenv("USERPROFILE", home)
+	t.Setenv("HOME", home)
+
+	return dir
 }

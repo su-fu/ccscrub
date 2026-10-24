@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/su-fu/ccscrub/internal/detect"
 	"github.com/su-fu/ccscrub/internal/discover"
 	"github.com/su-fu/ccscrub/internal/i18n"
 	"github.com/su-fu/ccscrub/internal/jsonl"
@@ -29,7 +30,6 @@ func run(args []string) int {
 
 	switch args[1] {
 	case "scan":
-		fmt.Println("scanに来た")
 		fset := flag.NewFlagSet("scan", flag.ContinueOnError)
 		lang := addLangFlag(fset)
 		minAge := addMinAgeFlag(fset)
@@ -45,7 +45,6 @@ func run(args []string) int {
 			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgInvalidMinAge, *minAge))
 			return 2
 		}
-		fmt.Println(resolvedLang)
 
 		home, err := os.UserHomeDir()
 		if err != nil {
@@ -64,13 +63,19 @@ func run(args []string) int {
 			return 2
 		}
 
+		foundAny := false
 		for _, p := range paths {
-			n, err := countLines(p)
+			found, err := scanFile(p)
 			if err != nil {
 				fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgCannotRead, p, err))
 				continue
 			}
-			fmt.Printf("%s\t%d\n", p, n)
+			if len(found) > 0 {
+				foundAny = true
+			}
+			for _, f := range found {
+				fmt.Printf("%s:%d:%d: %s %s\n", p, f.Line, f.Match.Start+1, f.Match.RuleID, f.Preview)
+			}
 		}
 
 		for _, skipped := range skippedList {
@@ -84,9 +89,11 @@ func run(args []string) int {
 			}
 		}
 
+		if foundAny {
+			return 1
+		}
 		return 0
 	case "fix":
-		fmt.Println("fixに来た")
 		fset := flag.NewFlagSet("fix", flag.ContinueOnError)
 		dryRun := fset.Bool("dry-run", false, "show what would change without modifying any files")
 		lang := addLangFlag(fset)
@@ -103,7 +110,6 @@ func run(args []string) int {
 			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgInvalidMinAge, *minAge))
 			return 2
 		}
-		fmt.Println(resolvedLang)
 		fmt.Println(*dryRun)
 		fmt.Println(*minAge)
 		return 0
@@ -133,19 +139,28 @@ func addMinAgeFlag(fs *flag.FlagSet) *time.Duration {
 	return fs.Duration("min-age", defaultMinAge, "skip transcripts modified within this duration, as they may be in use (e.g. 30m, 2h)")
 }
 
-func countLines(path string) (int, error) {
-	count := 0
+type finding struct {
+	Line    int
+	Match   detect.Match
+	Preview string
+}
+
+func scanFile(path string) ([]finding, error) {
+	var found []finding
 	f, err := os.Open(path)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	defer f.Close()
 	err = jsonl.ReadLines(f, func(num int, line []byte) error {
-		count++
+		for _, m := range detect.Find(line) {
+			p := detect.Preview(line, m)
+			found = append(found, finding{Line: num, Match: m, Preview: p})
+		}
 		return nil
 	})
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
-	return count, nil
+	return found, nil
 }
