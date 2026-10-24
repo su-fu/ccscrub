@@ -1,7 +1,9 @@
 package detect
 
 import (
+	"cmp"
 	"regexp"
+	"slices"
 )
 
 // previewKeep and previewMinLen control how Preview masks a match.
@@ -26,6 +28,11 @@ type Match struct {
 	End    int
 }
 
+// Find looks for secrets in line and returns where they are,
+// one Match for each.
+//
+// A match counts only if it is not part of a longer word.
+// The matches are sorted by Start. If nothing is found, Find returns nil.
 func Find(line []byte) []Match {
 	var result []Match
 	for _, rule := range rules {
@@ -37,6 +44,9 @@ func Find(line []byte) []Match {
 			result = append(result, Match{RuleID: rule.ID, Start: loc[0], End: loc[1]})
 		}
 	}
+	slices.SortFunc(result, func(a, b Match) int {
+		return cmp.Compare(a.Start, b.Start)
+	})
 	return result
 }
 

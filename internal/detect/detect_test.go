@@ -54,6 +54,10 @@ func TestFind(t *testing.T) {
 		{name: "aws after newline escape", line: "test" + `\n` + aws, want: []Match{
 			{RuleID: "aws-access-key-id", Start: 6, End: 26},
 		}},
+		{name: "aws then github", line: aws + " " + tok, want: []Match{
+			{RuleID: "aws-access-key-id", Start: 0, End: 20},
+			{RuleID: "github-token", Start: 21, End: 61},
+		}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
