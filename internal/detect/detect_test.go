@@ -10,6 +10,8 @@ func TestFind(t *testing.T) {
 	tok := "gh" + "p_" + strings.Repeat("A", 36)
 	aws := "AK" + "IA" + strings.Repeat("A", 16)
 	pat := "github" + "_pat_" + strings.Repeat("A", 22) + "_" + strings.Repeat("A", 59)
+	ant := "sk-ant-" + "api03-" + strings.Repeat("A", 93) + "AA"
+	antAdmin := "sk-ant-" + "admin01-" + strings.Repeat("A", 93) + "AA"
 	tests := []struct {
 		name string
 		line string
@@ -63,6 +65,14 @@ func TestFind(t *testing.T) {
 			{RuleID: "github-token", Start: 0, End: 93},
 		}},
 		{name: "github pat too short", line: pat[:len(pat)-1], want: nil},
+		{name: "anthropic key", line: ant, want: []Match{
+			{RuleID: "anthropic-api-key", Start: 0, End: 108},
+		}},
+		{name: "anthropic key too short", line: ant[:len(ant)-1], want: nil},
+		{name: "anthropic admin key", line: antAdmin, want: []Match{
+			{RuleID: "anthropic-admin-api-key", Start: 0, End: 110},
+		}},
+		{name: "anthropic admin key too short", line: antAdmin[:len(antAdmin)-1], want: nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -18,9 +18,14 @@ type Rule struct {
 }
 
 var rules = []Rule{
+	// Format: https://github.blog/2021-04-05-behind-githubs-new-authentication-token-formats/
 	{ID: "github-token", Pattern: regexp.MustCompile(`gh[pousr]_[A-Za-z0-9]{36}`)},
 	{ID: "github-token", Pattern: regexp.MustCompile(`github_pat_[A-Za-z0-9]{22}_[A-Za-z0-9]{59}`)},
+	// Format: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html
 	{ID: "aws-access-key-id", Pattern: regexp.MustCompile(`A[KS]IA[A-Z0-9]{16}`)},
+	// Based on gitleaks (MIT): https://github.com/gitleaks/gitleaks
+	{ID: "anthropic-api-key", Pattern: regexp.MustCompile(`sk-ant-api03-[a-zA-Z0-9_\-]{93}AA`)},
+	{ID: "anthropic-admin-api-key", Pattern: regexp.MustCompile(`sk-ant-admin01-[a-zA-Z0-9_\-]{93}AA`)},
 }
 
 type Match struct {
