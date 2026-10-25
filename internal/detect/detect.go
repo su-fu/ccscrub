@@ -26,6 +26,9 @@ var rules = []Rule{
 	// Based on gitleaks (MIT): https://github.com/gitleaks/gitleaks
 	{ID: "anthropic-api-key", Pattern: regexp.MustCompile(`sk-ant-api03-[a-zA-Z0-9_\-]{93}AA`)},
 	{ID: "anthropic-admin-api-key", Pattern: regexp.MustCompile(`sk-ant-admin01-[a-zA-Z0-9_\-]{93}AA`)},
+	// Based on gitleaks (MIT): https://github.com/gitleaks/gitleaks
+	{ID: "openai-api-key", Pattern: regexp.MustCompile(`sk-(?:proj|svcacct|admin)-(?:[a-zA-Z0-9_-]{74}|[a-zA-Z0-9_-]{58})T3BlbkFJ(?:[a-zA-Z0-9_-]{74}|[a-zA-Z0-9_-]{58})`)},
+	{ID: "openai-api-key", Pattern: regexp.MustCompile(`sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}`)},
 }
 
 type Match struct {

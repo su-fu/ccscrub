@@ -12,6 +12,12 @@ func TestFind(t *testing.T) {
 	pat := "github" + "_pat_" + strings.Repeat("A", 22) + "_" + strings.Repeat("A", 59)
 	ant := "sk-ant-" + "api03-" + strings.Repeat("A", 93) + "AA"
 	antAdmin := "sk-ant-" + "admin01-" + strings.Repeat("A", 93) + "AA"
+	openaiProj := "sk-" + "proj-" + strings.Repeat("A", 58) + "T3BlbkFJ" + strings.Repeat("A", 58)
+	openaiSvcacct := "sk-" + "svcacct-" + strings.Repeat("A", 74) + "T3BlbkFJ" + strings.Repeat("A", 74)
+	openaiAdmin := "sk-" + "admin-" + strings.Repeat("A", 58) + "T3BlbkFJ" + strings.Repeat("A", 74)
+	openaiLegacy := "sk-" + strings.Repeat("A", 20) + "T3BlbkFJ" + strings.Repeat("A", 20)
+	openaiNil := "sk-" + "proj-" + strings.Repeat("A", 58) + strings.Repeat("A", 58)
+
 	tests := []struct {
 		name string
 		line string
@@ -73,6 +79,19 @@ func TestFind(t *testing.T) {
 			{RuleID: "anthropic-admin-api-key", Start: 0, End: 110},
 		}},
 		{name: "anthropic admin key too short", line: antAdmin[:len(antAdmin)-1], want: nil},
+		{name: "openai proj key", line: openaiProj, want: []Match{
+			{RuleID: "openai-api-key", Start: 0, End: 132},
+		}},
+		{name: "openai svcacct key", line: openaiSvcacct, want: []Match{
+			{RuleID: "openai-api-key", Start: 0, End: 167},
+		}},
+		{name: "openai admin key", line: openaiAdmin, want: []Match{
+			{RuleID: "openai-api-key", Start: 0, End: 149},
+		}},
+		{name: "openai legacy key", line: openaiLegacy, want: []Match{
+			{RuleID: "openai-api-key", Start: 0, End: 51},
+		}},
+		{name: "openai nil key", line: openaiNil, want: nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
