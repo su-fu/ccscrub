@@ -20,6 +20,8 @@ func TestFind(t *testing.T) {
 	slackBot := "xoxb-" + strings.Repeat("0", 13) + "-" + strings.Repeat("0", 13) + "a"
 	slackUser := "xoxp-" + strings.Repeat("0", 13) + "-" + strings.Repeat("0", 13) + "-" + strings.Repeat("0", 13) + "-" + strings.Repeat("a", 34)
 	slackNil := "xoxb-" + strings.Repeat("0", 13) + "-" + "a"
+	google := "AIza" + strings.Repeat("a", 35)
+	googleNil := "aiza" + strings.Repeat("a", 35)
 
 	tests := []struct {
 		name string
@@ -102,6 +104,10 @@ func TestFind(t *testing.T) {
 			{RuleID: "slack-token", Start: 0, End: 81},
 		}},
 		{name: "slack nil token", line: slackNil, want: nil},
+		{name: "google api key", line: google, want: []Match{
+			{RuleID: "google-api-key", Start: 0, End: 39},
+		}},
+		{name: "google nil key", line: googleNil, want: nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
