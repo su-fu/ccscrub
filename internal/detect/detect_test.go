@@ -17,6 +17,9 @@ func TestFind(t *testing.T) {
 	openaiAdmin := "sk-" + "admin-" + strings.Repeat("A", 58) + "T3BlbkFJ" + strings.Repeat("A", 74)
 	openaiLegacy := "sk-" + strings.Repeat("A", 20) + "T3BlbkFJ" + strings.Repeat("A", 20)
 	openaiNil := "sk-" + "proj-" + strings.Repeat("A", 58) + strings.Repeat("A", 58)
+	slackBot := "xoxb-" + strings.Repeat("0", 13) + "-" + strings.Repeat("0", 13) + "a"
+	slackUser := "xoxp-" + strings.Repeat("0", 13) + "-" + strings.Repeat("0", 13) + "-" + strings.Repeat("0", 13) + "-" + strings.Repeat("a", 34)
+	slackNil := "xoxb-" + strings.Repeat("0", 13) + "-" + "a"
 
 	tests := []struct {
 		name string
@@ -92,6 +95,13 @@ func TestFind(t *testing.T) {
 			{RuleID: "openai-api-key", Start: 0, End: 51},
 		}},
 		{name: "openai nil key", line: openaiNil, want: nil},
+		{name: "slack bot token", line: slackBot, want: []Match{
+			{RuleID: "slack-token", Start: 0, End: 33},
+		}},
+		{name: "slack user token", line: slackUser, want: []Match{
+			{RuleID: "slack-token", Start: 0, End: 81},
+		}},
+		{name: "slack nil token", line: slackNil, want: nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

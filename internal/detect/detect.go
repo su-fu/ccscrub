@@ -29,6 +29,9 @@ var rules = []Rule{
 	// Based on gitleaks (MIT): https://github.com/gitleaks/gitleaks
 	{ID: "openai-api-key", Pattern: regexp.MustCompile(`sk-(?:proj|svcacct|admin)-(?:[a-zA-Z0-9_-]{74}|[a-zA-Z0-9_-]{58})T3BlbkFJ(?:[a-zA-Z0-9_-]{74}|[a-zA-Z0-9_-]{58})`)},
 	{ID: "openai-api-key", Pattern: regexp.MustCompile(`sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}`)},
+	// Based on gitleaks (MIT): https://github.com/gitleaks/gitleaks
+	{ID: "slack-token", Pattern: regexp.MustCompile(`xoxb-[0-9]{10,13}-[0-9]{10,13}[a-zA-Z0-9-]*`)},
+	{ID: "slack-token", Pattern: regexp.MustCompile(`xox[pe](?:-[0-9]{10,13}){3}-[a-zA-Z0-9-]{28,34}`)},
 }
 
 type Match struct {
