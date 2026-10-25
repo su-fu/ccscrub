@@ -9,6 +9,7 @@ import (
 func TestFind(t *testing.T) {
 	tok := "gh" + "p_" + strings.Repeat("A", 36)
 	aws := "AK" + "IA" + strings.Repeat("A", 16)
+	pat := "github" + "_pat_" + strings.Repeat("A", 22) + "_" + strings.Repeat("A", 59)
 	tests := []struct {
 		name string
 		line string
@@ -58,6 +59,10 @@ func TestFind(t *testing.T) {
 			{RuleID: "aws-access-key-id", Start: 0, End: 20},
 			{RuleID: "github-token", Start: 21, End: 61},
 		}},
+		{name: "github pat", line: pat, want: []Match{
+			{RuleID: "github-token", Start: 0, End: 93},
+		}},
+		{name: "github pat too short", line: pat[:len(pat)-1], want: nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -19,6 +19,7 @@ type Rule struct {
 
 var rules = []Rule{
 	{ID: "github-token", Pattern: regexp.MustCompile(`gh[pousr]_[A-Za-z0-9]{36}`)},
+	{ID: "github-token", Pattern: regexp.MustCompile(`github_pat_[A-Za-z0-9]{22}_[A-Za-z0-9]{59}`)},
 	{ID: "aws-access-key-id", Pattern: regexp.MustCompile(`A[KS]IA[A-Z0-9]{16}`)},
 }
 
