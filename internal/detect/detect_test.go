@@ -22,6 +22,8 @@ func TestFind(t *testing.T) {
 	slackNil := "xoxb-" + strings.Repeat("0", 13) + "-" + "a"
 	google := "AIza" + strings.Repeat("a", 35)
 	googleNil := "aiza" + strings.Repeat("a", 35)
+	pem := "-----BEGIN " + "RSA PRIVATE KEY-----" + `\nAAAA\nBBBB==\n` + "-----END RSA PRIVATE KEY-----"
+	pemNil := "-----BEGIN " + "RSA PRIVATE KEY-----" + `\nAAAA\nBBBB==\n`
 
 	tests := []struct {
 		name string
@@ -108,6 +110,10 @@ func TestFind(t *testing.T) {
 			{RuleID: "google-api-key", Start: 0, End: 39},
 		}},
 		{name: "google nil key", line: googleNil, want: nil},
+		{name: "private key", line: pem, want: []Match{
+			{RuleID: "private-key", Start: 0, End: 76},
+		}},
+		{name: "private nil key", line: pemNil, want: nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

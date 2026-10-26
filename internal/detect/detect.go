@@ -34,6 +34,8 @@ var rules = []Rule{
 	{ID: "slack-token", Pattern: regexp.MustCompile(`xox[pe](?:-[0-9]{10,13}){3}-[a-zA-Z0-9-]{28,34}`)},
 	// Based on gitleaks (MIT): https://github.com/gitleaks/gitleaks
 	{ID: "google-api-key", Pattern: regexp.MustCompile(`AIza[\w-]{35}`)},
+	// Format: https://www.rfc-editor.org/rfc/rfc7468
+	{ID: "private-key", Pattern: regexp.MustCompile(`-----BEGIN[ A-Z]* PRIVATE KEY-----(?:[A-Za-z0-9+/=]|\\n)+-----END[ A-Z]* PRIVATE KEY-----`)},
 }
 
 type Match struct {
