@@ -63,7 +63,8 @@ func run(args []string) int {
 			return 2
 		}
 
-		foundAny := false
+		secrets := 0
+		files := 0
 		for _, p := range paths {
 			found, err := scanFile(p)
 			if err != nil {
@@ -71,13 +72,14 @@ func run(args []string) int {
 				continue
 			}
 			if len(found) > 0 {
-				foundAny = true
+				secrets += len(found)
+				files++
 			}
 			for _, f := range found {
 				fmt.Printf("%s:%d:%d: %s %s\n", p, f.Line, f.Match.Start+1, f.Match.RuleID, f.Preview)
 			}
 		}
-
+		fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgSummary, secrets, files))
 		for _, skipped := range skippedList {
 			switch skipped.Reason {
 			case discover.SkipUnreadable:
@@ -89,7 +91,7 @@ func run(args []string) int {
 			}
 		}
 
-		if foundAny {
+		if files > 0 {
 			return 1
 		}
 		return 0

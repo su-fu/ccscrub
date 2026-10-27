@@ -238,6 +238,34 @@ func TestT(t *testing.T) {
 			args: []any{"project", 4 * time.Minute},
 			want: `[SKIP] "project" may be in use (modified 4m0s ago)`,
 		},
+		{
+			name: "summary(en)",
+			lang: "en",
+			id:   MsgSummary,
+			args: []any{2, 1},
+			want: `2 secrets found in 1 files`,
+		},
+		{
+			name: "summary(ja)",
+			lang: "ja",
+			id:   MsgSummary,
+			args: []any{2, 1},
+			want: `2 件のシークレットが 1 個のファイルで見つかりました`,
+		},
+		{
+			name: "summary(zh)",
+			lang: "zh",
+			id:   MsgSummary,
+			args: []any{2, 1},
+			want: `发现 2 处机密信息，涉及 1 个文件`,
+		},
+		{
+			name: "summary(fr)",
+			lang: "fr",
+			id:   MsgSummary,
+			args: []any{2, 1},
+			want: `2 secrets found in 1 files`,
+		},
 	}
 
 	for _, tt := range tests {
