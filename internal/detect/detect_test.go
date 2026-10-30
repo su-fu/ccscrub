@@ -147,3 +147,25 @@ func TestPreview(t *testing.T) {
 		})
 	}
 }
+
+func TestRedact(t *testing.T) {
+	tok := "gh" + "p_" + strings.Repeat("A", 32) + "WXYZ"
+	aws := "AK" + "IA" + strings.Repeat("A", 16)
+	tests := []struct {
+		name string
+		line string
+		want string
+	}{
+		{name: "no match", line: "hello", want: "hello"},
+		{name: "one match", line: "token=" + tok + " end", want: "token=[REDACTED:github-token] end"},
+		{name: "two matches", line: aws + " " + tok, want: "[REDACTED:aws-access-key-id] [REDACTED:github-token]"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := Redact([]byte(tt.line), Find([]byte(tt.line)))
+			if string(got) != tt.want {
+				t.Errorf("Redact(%q) got = %q, want = %q", tt.line, string(got), tt.want)
+			}
+		})
+	}
+}

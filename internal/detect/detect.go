@@ -99,3 +99,22 @@ func okAfter(line []byte, end int) bool {
 	}
 	return !isWordChar(line[end])
 }
+
+// Redact returns a new line with each match replaced by [REDACTED:<rule-id>].
+//
+// It expects matches to be sorted by Start, as Find returns them.
+func Redact(line []byte, matches []Match) []byte {
+	var result []byte
+
+	prev := 0
+	for _, m := range matches {
+		result = append(result, line[prev:m.Start]...)
+		result = append(result, []byte("[REDACTED:")...)
+		result = append(result, []byte(m.RuleID)...)
+		result = append(result, []byte("]")...)
+		prev = m.End
+	}
+	result = append(result, line[prev:]...)
+
+	return result
+}
