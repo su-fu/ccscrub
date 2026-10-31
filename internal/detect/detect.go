@@ -103,11 +103,18 @@ func okAfter(line []byte, end int) bool {
 // Redact returns a new line with each match replaced by [REDACTED:<rule-id>].
 //
 // It expects matches to be sorted by Start, as Find returns them.
+// A match that overlaps an earlier one is merged into it.
 func Redact(line []byte, matches []Match) []byte {
 	var result []byte
 
 	prev := 0
 	for _, m := range matches {
+		if m.Start < prev {
+			if m.End > prev {
+				prev = m.End
+			}
+			continue
+		}
 		result = append(result, line[prev:m.Start]...)
 		result = append(result, []byte("[REDACTED:")...)
 		result = append(result, []byte(m.RuleID)...)

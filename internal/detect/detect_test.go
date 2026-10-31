@@ -151,6 +151,7 @@ func TestPreview(t *testing.T) {
 func TestRedact(t *testing.T) {
 	tok := "gh" + "p_" + strings.Repeat("A", 32) + "WXYZ"
 	aws := "AK" + "IA" + strings.Repeat("A", 16)
+	pemAws := "-----BEGIN " + "PRIVATE KEY-----" + `\n` + aws + `\n` + "-----END PRIVATE KEY-----"
 	tests := []struct {
 		name string
 		line string
@@ -159,6 +160,7 @@ func TestRedact(t *testing.T) {
 		{name: "no match", line: "hello", want: "hello"},
 		{name: "one match", line: "token=" + tok + " end", want: "token=[REDACTED:github-token] end"},
 		{name: "two matches", line: aws + " " + tok, want: "[REDACTED:aws-access-key-id] [REDACTED:github-token]"},
+		{name: "overlap", line: pemAws, want: "[REDACTED:private-key]"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -167,5 +169,19 @@ func TestRedact(t *testing.T) {
 				t.Errorf("Redact(%q) got = %q, want = %q", tt.line, string(got), tt.want)
 			}
 		})
+	}
+}
+
+func TestRedactPartialOverlap(t *testing.T) {
+	line := []byte("0123456789")
+	matches := []Match{
+		{RuleID: "a", Start: 0, End: 6},
+		{RuleID: "b", Start: 4, End: 9},
+	}
+	want := "[REDACTED:a]9"
+
+	got := Redact(line, matches)
+	if string(got) != want {
+		t.Errorf("Redact(%q) got = %q, want = %q", line, string(got), want)
 	}
 }
