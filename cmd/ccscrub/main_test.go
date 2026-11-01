@@ -150,7 +150,7 @@ func TestRedactLine(t *testing.T) {
 		wantOK   bool
 	}{
 		{name: "valid", line: `{"text":"` + tok + `"}` + "\n", wantLine: `{"text":"[REDACTED:github-token]"}` + "\n", wantOK: true},
-		{name: "broken", line: `{"text":"` + tok + "\n", wantLine: `{"text":"` + tok + "\n", wantOK: false},
+		{name: "broken", line: `{"text":"` + tok + "\n", wantLine: `{"text":"[REDACTED:github-token]` + "\n", wantOK: true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

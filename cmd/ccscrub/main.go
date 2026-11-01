@@ -170,8 +170,8 @@ func scanFile(path string) ([]finding, error) {
 
 func redactLine(line []byte) ([]byte, bool) {
 	newLine := detect.Redact(line, detect.Find(line))
-	if json.Valid(newLine) {
-		return newLine, true
+	if json.Valid(line) && !json.Valid(newLine) {
+		return line, false
 	}
-	return line, false
+	return newLine, true
 }
