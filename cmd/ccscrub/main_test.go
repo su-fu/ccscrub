@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -137,6 +138,27 @@ func TestRunScanFindsSecret(t *testing.T) {
 
 	if got != want {
 		t.Errorf("run(%q) = %d, want %d", args, got, want)
+	}
+}
+
+func TestRedactLine(t *testing.T) {
+	tok := "gh" + "p_" + strings.Repeat("A", 36)
+	tests := []struct {
+		name     string
+		line     string
+		wantLine string
+		wantOK   bool
+	}{
+		{name: "valid", line: `{"text":"` + tok + `"}` + "\n", wantLine: `{"text":"[REDACTED:github-token]"}` + "\n", wantOK: true},
+		{name: "broken", line: `{"text":"` + tok + "\n", wantLine: `{"text":"` + tok + "\n", wantOK: false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotLine, gotOK := redactLine([]byte(tt.line))
+			if !(slices.Equal(gotLine, []byte(tt.wantLine)) && gotOK == tt.wantOK) {
+				t.Errorf("redactLine(%q) = gotLine %q, gotOK %v, wantLine %q, wantOK %v", tt.line, string(gotLine), gotOK, tt.wantLine, tt.wantOK)
+			}
+		})
 	}
 }
 

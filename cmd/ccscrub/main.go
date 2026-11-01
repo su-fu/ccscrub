@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
@@ -165,4 +166,12 @@ func scanFile(path string) ([]finding, error) {
 		return nil, err
 	}
 	return found, nil
+}
+
+func redactLine(line []byte) ([]byte, bool) {
+	newLine := detect.Redact(line, detect.Find(line))
+	if json.Valid(newLine) {
+		return newLine, true
+	}
+	return line, false
 }
