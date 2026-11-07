@@ -175,3 +175,47 @@ func redactLine(line []byte) ([]byte, bool) {
 	}
 	return newLine, true
 }
+
+func fixFile(path string) (int, error) {
+	src, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	defer src.Close()
+
+	tmp, err := os.CreateTemp(filepath.Dir(path), ".ccscrub-*.tmp")
+	if err != nil {
+		return 0, err
+	}
+	defer os.Remove(tmp.Name())
+	defer tmp.Close()
+
+	err = jsonl.ReadLines(src, func(num int, line []byte) error {
+		_, err := tmp.Write(line)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		return 0, err
+	}
+
+	err = src.Close()
+	if err != nil {
+		return 0, err
+	}
+
+	err = tmp.Close()
+	if err != nil {
+		return 0, err
+	}
+
+	err = os.Rename(tmp.Name(), src.Name())
+	if err != nil {
+		return 0, err
+	}
+
+	return 0, nil
+}

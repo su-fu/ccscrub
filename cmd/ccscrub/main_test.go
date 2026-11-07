@@ -126,18 +126,17 @@ func TestRunScanFindsSecret(t *testing.T) {
 	path := filepath.Join(dir, "test.jsonl")
 
 	tok := "gh" + "p_" + strings.Repeat("A", 36)
-	content := `{"text":"` + tok + `"}` + "\n"
+	want := `{"text":"` + tok + `"}` + "\n"
 
-	err := os.WriteFile(path, []byte(content), 0o644)
+	err := os.WriteFile(path, []byte(want), 0o644)
 	if err != nil {
 		t.Fatalf("WriteFile(%q): %v", path, err)
 	}
 	args := []string{"ccscrub", "scan", "--min-age=0"}
 	got := run(args)
-	want := 1
 
-	if got != want {
-		t.Errorf("run(%q) = %d, want %d", args, got, want)
+	if got != 1 {
+		t.Errorf("run(%q) = %d, want %d", args, got, 1)
 	}
 }
 
@@ -174,4 +173,46 @@ func setupHome(t *testing.T) string {
 	t.Setenv("HOME", home)
 
 	return dir
+}
+
+func TestFixFileCopy(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "test.jsonl")
+
+	tokA := "gh" + "p_" + strings.Repeat("A", 36)
+	tokB := "gh" + "p_" + strings.Repeat("B", 36)
+	tokC := "gh" + "p_" + strings.Repeat("C", 36)
+	want := `{"text":"` + tokA + `"}` + "\n" + `{"text":"` + tokB + `"}` + "\n" + `{"text":"` + tokC + `"}` + "\n"
+
+	err := os.WriteFile(path, []byte(want), 0o644)
+	if err != nil {
+		t.Fatalf("WriteFile(%q): %v", path, err)
+	}
+
+	n, err := fixFile(path)
+	if err != nil {
+		t.Fatalf("fixFile(%q): %v", path, err)
+	}
+
+	got, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("ReadFile(%q): %v", path, err)
+	}
+
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		t.Fatalf("ReadDir(%q): %v", dir, err)
+	}
+
+	if n != 0 {
+		t.Errorf("fixFile(%q) n = %d, want 0", path, n)
+	}
+
+	if !slices.Equal(got, []byte(want)) {
+		t.Errorf("fixFile(%q) got = %q, want = %q", path, string(got), string(want))
+	}
+
+	if len(entries) != 1 {
+		t.Errorf("ReadDir(%q) = %d entries, want 1", dir, len(entries))
+	}
 }
