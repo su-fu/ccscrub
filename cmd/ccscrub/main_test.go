@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestRun(t *testing.T) {
@@ -215,5 +216,60 @@ func TestFixFile(t *testing.T) {
 
 	if len(entries) != 1 {
 		t.Errorf("ReadDir(%q) = %d entries, want 1", dir, len(entries))
+	}
+}
+
+func TestFixFileNoSecrets(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "test.jsonl")
+
+	input := `{"text":"hello"}` + "\n"
+	want := `{"text":"hello"}` + "\n"
+
+	err := os.WriteFile(path, []byte(input), 0o644)
+	if err != nil {
+		t.Fatalf("WriteFile(%q): %v", path, err)
+	}
+
+	old := time.Date(2026, time.October, 1, 11, 0, 0, 0, time.UTC)
+	err = os.Chtimes(path, old, old)
+	if err != nil {
+		t.Fatalf("Chtimes(%q): %v", path, err)
+	}
+
+	n, err := fixFile(path)
+	if err != nil {
+		t.Fatalf("fixFile(%q): %v", path, err)
+	}
+
+	got, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("ReadFile(%q): %v", path, err)
+	}
+
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		t.Fatalf("ReadDir(%q): %v", dir, err)
+	}
+
+	fi, err := os.Stat(path)
+	if err != nil {
+		t.Fatalf("Stat(%q): %v", path, err)
+	}
+
+	if n != 0 {
+		t.Errorf("fixFile(%q) n = %d, want 0", path, n)
+	}
+
+	if !slices.Equal(got, []byte(want)) {
+		t.Errorf("fixFile(%q) got = %q, want = %q", path, string(got), string(want))
+	}
+
+	if len(entries) != 1 {
+		t.Errorf("ReadDir(%q) = %d entries, want 1", dir, len(entries))
+	}
+
+	if !old.Equal(fi.ModTime()) {
+		t.Errorf("ModTime = %v, want = %v", fi.ModTime(), old)
 	}
 }

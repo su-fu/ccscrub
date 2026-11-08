@@ -217,6 +217,10 @@ func fixFile(path string) (int, error) {
 		return 0, err
 	}
 
+	if n == 0 {
+		return 0, nil
+	}
+
 	err = os.Rename(tmp.Name(), src.Name())
 	if err != nil {
 		return 0, err
