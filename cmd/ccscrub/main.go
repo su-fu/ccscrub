@@ -190,8 +190,13 @@ func fixFile(path string) (int, error) {
 	defer os.Remove(tmp.Name())
 	defer tmp.Close()
 
+	n := 0
 	err = jsonl.ReadLines(src, func(num int, line []byte) error {
-		_, err := tmp.Write(line)
+		newLine, ok := redactLine(line)
+		if ok {
+			n += len(detect.Find(line))
+		}
+		_, err := tmp.Write(newLine)
 		if err != nil {
 			return err
 		}
@@ -217,5 +222,5 @@ func fixFile(path string) (int, error) {
 		return 0, err
 	}
 
-	return 0, nil
+	return n, nil
 }

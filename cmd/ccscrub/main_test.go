@@ -175,16 +175,17 @@ func setupHome(t *testing.T) string {
 	return dir
 }
 
-func TestFixFileCopy(t *testing.T) {
+func TestFixFile(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "test.jsonl")
 
 	tokA := "gh" + "p_" + strings.Repeat("A", 36)
 	tokB := "gh" + "p_" + strings.Repeat("B", 36)
 	tokC := "gh" + "p_" + strings.Repeat("C", 36)
-	want := `{"text":"` + tokA + `"}` + "\n" + `{"text":"` + tokB + `"}` + "\n" + `{"text":"` + tokC + `"}` + "\n"
+	input := `{"text":"` + tokA + `"}` + "\n" + `{"text":"` + tokB + `"}` + "\n" + `{"text":"` + tokC + `"}` + "\n" + `{"text":"hello"}` + "\n"
+	want := `{"text":"[REDACTED:github-token]"}` + "\n" + `{"text":"[REDACTED:github-token]"}` + "\n" + `{"text":"[REDACTED:github-token]"}` + "\n" + `{"text":"hello"}` + "\n"
 
-	err := os.WriteFile(path, []byte(want), 0o644)
+	err := os.WriteFile(path, []byte(input), 0o644)
 	if err != nil {
 		t.Fatalf("WriteFile(%q): %v", path, err)
 	}
@@ -204,8 +205,8 @@ func TestFixFileCopy(t *testing.T) {
 		t.Fatalf("ReadDir(%q): %v", dir, err)
 	}
 
-	if n != 0 {
-		t.Errorf("fixFile(%q) n = %d, want 0", path, n)
+	if n != 3 {
+		t.Errorf("fixFile(%q) n = %d, want 3", path, n)
 	}
 
 	if !slices.Equal(got, []byte(want)) {
