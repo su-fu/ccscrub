@@ -294,6 +294,34 @@ func TestT(t *testing.T) {
 			args: []any{2, 1},
 			want: `2 secrets redacted in 1 files`,
 		},
+		{
+			name: "min-age zero(en)",
+			lang: "en",
+			id:   MsgMinAgeZero,
+			args: nil,
+			want: `warning: -min-age=0 also rewrites sessions that may be in use`,
+		},
+		{
+			name: "min-age zero(ja)",
+			lang: "ja",
+			id:   MsgMinAgeZero,
+			args: nil,
+			want: `警告: -min-age=0 では、使用中の可能性があるセッションも書き換えます`,
+		},
+		{
+			name: "min-age zero(zh)",
+			lang: "zh",
+			id:   MsgMinAgeZero,
+			args: nil,
+			want: `警告: -min-age=0 会同时改写可能正在使用的会话`,
+		},
+		{
+			name: "min-age zero(fr)",
+			lang: "fr",
+			id:   MsgMinAgeZero,
+			args: nil,
+			want: `warning: -min-age=0 also rewrites sessions that may be in use`,
+		},
 	}
 
 	for _, tt := range tests {

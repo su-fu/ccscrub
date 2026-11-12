@@ -102,6 +102,9 @@ func run(args []string) int {
 			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgInvalidMinAge, *minAge))
 			return 2
 		}
+		if *minAge == 0 && !*dryRun {
+			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgMinAgeZero))
+		}
 
 		now := time.Now()
 		paths, skippedList, ok := findTranscripts(resolvedLang, *minAge, now)

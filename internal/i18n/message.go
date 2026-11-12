@@ -17,6 +17,7 @@ const (
 	MsgSkippedActive
 	MsgSummary
 	MsgFixSummary
+	MsgMinAgeZero
 )
 
 var messageEn = map[MessageID]string{
@@ -30,6 +31,7 @@ var messageEn = map[MessageID]string{
 	MsgSkippedActive:     "[SKIP] %q may be in use (modified %v ago)",
 	MsgSummary:           "%d secrets found in %d files",
 	MsgFixSummary:        "%d secrets redacted in %d files",
+	MsgMinAgeZero:        "warning: -min-age=0 also rewrites sessions that may be in use",
 }
 
 var messageJa = map[MessageID]string{
@@ -43,6 +45,7 @@ var messageJa = map[MessageID]string{
 	MsgSkippedActive:     "[SKIP] %q は使用中の可能性があります (%v 前に更新)",
 	MsgSummary:           "%d 件のシークレットが %d 個のファイルで見つかりました",
 	MsgFixSummary:        "%d 件のシークレットを %d 個のファイルで更新しました",
+	MsgMinAgeZero:        "警告: -min-age=0 では、使用中の可能性があるセッションも書き換えます",
 }
 
 var messageZh = map[MessageID]string{
@@ -56,6 +59,7 @@ var messageZh = map[MessageID]string{
 	MsgSkippedActive:     "[SKIP] %q 可能正在使用 (%v 前更新)",
 	MsgSummary:           "发现 %d 处机密信息，涉及 %d 个文件",
 	MsgFixSummary:        "已脱敏 %d 处机密信息，涉及 %d 个文件",
+	MsgMinAgeZero:        "警告: -min-age=0 会同时改写可能正在使用的会话",
 }
 
 var messages = map[string]map[MessageID]string{
