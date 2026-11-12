@@ -47,20 +47,9 @@ func run(args []string) int {
 			return 2
 		}
 
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return 2
-		}
-
-		root := filepath.Join(home, ".claude", "projects")
 		now := time.Now()
-		paths, skippedList, err := discover.Find(root, *minAge, now)
-		if errors.Is(err, fs.ErrNotExist) {
-			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgPathNotFound, root))
-			return 2
-		}
-		if err != nil {
-			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgPathAccessError, root, err))
+		paths, skippedList, ok := findTranscripts(resolvedLang, *minAge, now)
+		if !ok {
 			return 2
 		}
 
@@ -113,8 +102,46 @@ func run(args []string) int {
 			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgInvalidMinAge, *minAge))
 			return 2
 		}
-		fmt.Println(*dryRun)
-		fmt.Println(*minAge)
+
+		now := time.Now()
+		paths, skippedList, ok := findTranscripts(resolvedLang, *minAge, now)
+		if !ok {
+			return 2
+		}
+
+		secrets := 0
+		files := 0
+		if *dryRun {
+			for _, p := range paths {
+				found, err := scanFile(p)
+				if err != nil {
+					fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgCannotRead, p, err))
+					continue
+				}
+				if len(found) > 0 {
+					secrets += len(found)
+					files++
+				}
+				for _, f := range found {
+					fmt.Printf("%s:%d:%d: %s %s\n", p, f.Line, f.Match.Start+1, f.Match.RuleID, f.Preview)
+				}
+			}
+			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgSummary, secrets, files))
+		}
+		for _, skipped := range skippedList {
+			switch skipped.Reason {
+			case discover.SkipUnreadable:
+				fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgCannotRead, skipped.Path, skipped.Err))
+			case discover.SkipActive:
+				fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgSkippedActive, skipped.Path, now.Sub(skipped.LastModified).Round(time.Second)))
+			default:
+				fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgSkipped, skipped.Path, skipped.Reason))
+			}
+		}
+
+		if files > 0 {
+			return 1
+		}
 		return 0
 	default:
 		fmt.Fprintln(os.Stderr, i18n.T(resolveLang("", os.Getenv(langEnv)), i18n.MsgUnknownSubcommand, args[1]))
@@ -227,4 +254,23 @@ func fixFile(path string) (int, error) {
 	}
 
 	return n, nil
+}
+
+func findTranscripts(lang string, minAge time.Duration, now time.Time) ([]string, []discover.SkippedEntry, bool) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, nil, false
+	}
+
+	root := filepath.Join(home, ".claude", "projects")
+	paths, skippedList, err := discover.Find(root, minAge, now)
+	if errors.Is(err, fs.ErrNotExist) {
+		fmt.Fprintln(os.Stderr, i18n.T(lang, i18n.MsgPathNotFound, root))
+		return nil, nil, false
+	}
+	if err != nil {
+		fmt.Fprintln(os.Stderr, i18n.T(lang, i18n.MsgPathAccessError, root, err))
+		return nil, nil, false
+	}
+	return paths, skippedList, true
 }

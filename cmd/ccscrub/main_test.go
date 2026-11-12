@@ -273,3 +273,31 @@ func TestFixFileNoSecrets(t *testing.T) {
 		t.Errorf("ModTime = %v, want = %v", fi.ModTime(), old)
 	}
 }
+
+func TestRunFixDryRun(t *testing.T) {
+	dir := setupHome(t)
+	path := filepath.Join(dir, "test.jsonl")
+
+	tok := "gh" + "p_" + strings.Repeat("A", 36)
+	want := `{"text":"` + tok + `"}` + "\n"
+
+	err := os.WriteFile(path, []byte(want), 0o644)
+	if err != nil {
+		t.Fatalf("WriteFile(%q): %v", path, err)
+	}
+	args := []string{"ccscrub", "fix", "--dry-run", "--min-age=0"}
+	code := run(args)
+
+	gotContent, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("ReadFile(%q): %v", path, err)
+	}
+
+	if code != 1 {
+		t.Errorf("run(%q) = %d, want %d", args, code, 1)
+	}
+
+	if !slices.Equal(gotContent, []byte(want)) {
+		t.Errorf("file changed got = %q, want = %q", string(gotContent), string(want))
+	}
+}
