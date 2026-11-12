@@ -127,6 +127,19 @@ func run(args []string) int {
 				}
 			}
 			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgSummary, secrets, files))
+		} else {
+			for _, p := range paths {
+				n, err := fixFile(p)
+				if err != nil {
+					fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgCannotRead, p, err))
+					continue
+				}
+				if n > 0 {
+					secrets += n
+					files++
+				}
+			}
+			fmt.Fprintln(os.Stderr, i18n.T(resolvedLang, i18n.MsgFixSummary, secrets, files))
 		}
 		for _, skipped := range skippedList {
 			switch skipped.Reason {
@@ -139,7 +152,7 @@ func run(args []string) int {
 			}
 		}
 
-		if files > 0 {
+		if files > 0 && *dryRun {
 			return 1
 		}
 		return 0

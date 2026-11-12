@@ -301,3 +301,32 @@ func TestRunFixDryRun(t *testing.T) {
 		t.Errorf("file changed got = %q, want = %q", string(gotContent), string(want))
 	}
 }
+
+func TestRunFix(t *testing.T) {
+	dir := setupHome(t)
+	path := filepath.Join(dir, "test.jsonl")
+	tok := "gh" + "p_" + strings.Repeat("A", 36)
+	input := `{"text":"` + tok + `"}` + "\n"
+
+	want := `{"text":"[REDACTED:github-token]"}` + "\n"
+
+	err := os.WriteFile(path, []byte(input), 0o644)
+	if err != nil {
+		t.Fatalf("WriteFile(%q): %v", path, err)
+	}
+	args := []string{"ccscrub", "fix", "--min-age=0"}
+	code := run(args)
+
+	gotContent, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatalf("ReadFile(%q): %v", path, err)
+	}
+
+	if code != 0 {
+		t.Errorf("run(%q) = %d, want %d", args, code, 0)
+	}
+
+	if !slices.Equal(gotContent, []byte(want)) {
+		t.Errorf("file content got = %q, want = %q", string(gotContent), string(want))
+	}
+}
