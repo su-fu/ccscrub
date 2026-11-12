@@ -266,6 +266,34 @@ func TestT(t *testing.T) {
 			args: []any{2, 1},
 			want: `2 secrets found in 1 files`,
 		},
+		{
+			name: "fix summary(en)",
+			lang: "en",
+			id:   MsgFixSummary,
+			args: []any{2, 1},
+			want: `2 secrets redacted in 1 files`,
+		},
+		{
+			name: "fix summary(ja)",
+			lang: "ja",
+			id:   MsgFixSummary,
+			args: []any{2, 1},
+			want: `2 件のシークレットを 1 個のファイルで更新しました`,
+		},
+		{
+			name: "fix summary(zh)",
+			lang: "zh",
+			id:   MsgFixSummary,
+			args: []any{2, 1},
+			want: `已脱敏 2 处机密信息，涉及 1 个文件`,
+		},
+		{
+			name: "fix summary(fr)",
+			lang: "fr",
+			id:   MsgFixSummary,
+			args: []any{2, 1},
+			want: `2 secrets redacted in 1 files`,
+		},
 	}
 
 	for _, tt := range tests {

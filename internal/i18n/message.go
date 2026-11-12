@@ -16,6 +16,7 @@ const (
 	MsgInvalidMinAge
 	MsgSkippedActive
 	MsgSummary
+	MsgFixSummary
 )
 
 var messageEn = map[MessageID]string{
@@ -28,6 +29,7 @@ var messageEn = map[MessageID]string{
 	MsgInvalidMinAge:     "invalid value %q for flag -min-age: must not be negative",
 	MsgSkippedActive:     "[SKIP] %q may be in use (modified %v ago)",
 	MsgSummary:           "%d secrets found in %d files",
+	MsgFixSummary:        "%d secrets redacted in %d files",
 }
 
 var messageJa = map[MessageID]string{
@@ -40,6 +42,7 @@ var messageJa = map[MessageID]string{
 	MsgInvalidMinAge:     "-min-age の値 %q は不正です: 負の値は指定できません",
 	MsgSkippedActive:     "[SKIP] %q は使用中の可能性があります (%v 前に更新)",
 	MsgSummary:           "%d 件のシークレットが %d 個のファイルで見つかりました",
+	MsgFixSummary:        "%d 件のシークレットを %d 個のファイルで更新しました",
 }
 
 var messageZh = map[MessageID]string{
@@ -52,6 +55,7 @@ var messageZh = map[MessageID]string{
 	MsgInvalidMinAge:     "-min-age 的值 %q 无效: 不能为负数",
 	MsgSkippedActive:     "[SKIP] %q 可能正在使用 (%v 前更新)",
 	MsgSummary:           "发现 %d 处机密信息，涉及 %d 个文件",
+	MsgFixSummary:        "已脱敏 %d 处机密信息，涉及 %d 个文件",
 }
 
 var messages = map[string]map[MessageID]string{
