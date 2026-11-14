@@ -243,7 +243,7 @@ func TestT(t *testing.T) {
 			lang: "en",
 			id:   MsgSummary,
 			args: []any{2, 1},
-			want: `2 secrets found in 1 files`,
+			want: `secrets found: 2, files: 1`,
 		},
 		{
 			name: "summary(ja)",
@@ -264,14 +264,14 @@ func TestT(t *testing.T) {
 			lang: "fr",
 			id:   MsgSummary,
 			args: []any{2, 1},
-			want: `2 secrets found in 1 files`,
+			want: `secrets found: 2, files: 1`,
 		},
 		{
 			name: "fix summary(en)",
 			lang: "en",
 			id:   MsgFixSummary,
 			args: []any{2, 1},
-			want: `2 secrets redacted in 1 files`,
+			want: `secrets redacted: 2, files: 1`,
 		},
 		{
 			name: "fix summary(ja)",
@@ -292,7 +292,7 @@ func TestT(t *testing.T) {
 			lang: "fr",
 			id:   MsgFixSummary,
 			args: []any{2, 1},
-			want: `2 secrets redacted in 1 files`,
+			want: `secrets redacted: 2, files: 1`,
 		},
 		{
 			name: "min-age zero(en)",

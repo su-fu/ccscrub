@@ -29,8 +29,8 @@ var messageEn = map[MessageID]string{
 	MsgCannotRead:        "[SKIP] cannot read %q: %v",
 	MsgInvalidMinAge:     "invalid value %q for flag -min-age: must not be negative",
 	MsgSkippedActive:     "[SKIP] %q may be in use (modified %v ago)",
-	MsgSummary:           "%d secrets found in %d files",
-	MsgFixSummary:        "%d secrets redacted in %d files",
+	MsgSummary:           "secrets found: %d, files: %d",
+	MsgFixSummary:        "secrets redacted: %d, files: %d",
 	MsgMinAgeZero:        "warning: -min-age=0 also rewrites sessions that may be in use",
 }
 
