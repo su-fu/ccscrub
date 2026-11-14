@@ -191,6 +191,12 @@ func TestFixFile(t *testing.T) {
 		t.Fatalf("WriteFile(%q): %v", path, err)
 	}
 
+	old := time.Date(2026, time.October, 1, 11, 0, 0, 0, time.UTC)
+	err = os.Chtimes(path, old, old)
+	if err != nil {
+		t.Fatalf("Chtimes(%q): %v", path, err)
+	}
+
 	n, err := fixFile(path)
 	if err != nil {
 		t.Fatalf("fixFile(%q): %v", path, err)
@@ -206,6 +212,11 @@ func TestFixFile(t *testing.T) {
 		t.Fatalf("ReadDir(%q): %v", dir, err)
 	}
 
+	fi, err := os.Stat(path)
+	if err != nil {
+		t.Fatalf("Stat(%q): %v", path, err)
+	}
+
 	if n != 3 {
 		t.Errorf("fixFile(%q) n = %d, want 3", path, n)
 	}
@@ -216,6 +227,10 @@ func TestFixFile(t *testing.T) {
 
 	if len(entries) != 1 {
 		t.Errorf("ReadDir(%q) = %d entries, want 1", dir, len(entries))
+	}
+
+	if !old.Equal(fi.ModTime()) {
+		t.Errorf("ModTime = %v, want %v", fi.ModTime(), old)
 	}
 }
 

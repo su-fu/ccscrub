@@ -226,6 +226,12 @@ func fixFile(path string) (int, error) {
 	}
 	defer src.Close()
 
+	fi, err := src.Stat()
+	if err != nil {
+		return 0, err
+	}
+	old := fi.ModTime()
+
 	tmp, err := os.CreateTemp(filepath.Dir(path), ".ccscrub-*.tmp")
 	if err != nil {
 		return 0, err
@@ -265,6 +271,11 @@ func fixFile(path string) (int, error) {
 	}
 
 	err = os.Rename(tmp.Name(), src.Name())
+	if err != nil {
+		return 0, err
+	}
+
+	err = os.Chtimes(path, old, old)
 	if err != nil {
 		return 0, err
 	}
